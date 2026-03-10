@@ -1,5 +1,5 @@
 {
-  "name": "Postgres Data Prep",
+  "name": "My Data Prep",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspaces/my-data-prep",
