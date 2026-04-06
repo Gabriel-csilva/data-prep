@@ -1,0 +1,110 @@
+// --- DIMENSÕES ---
+
+Table dim_tempo {
+  sk_tempo serial [primary key]
+  dia int [not null]
+  mes int [not null]
+  ano int [not null]
+  trimestre int
+  semestre int
+  Note: 'SCD Tipo 0 - Retenção Original'
+}
+
+Table dim_cliente {
+  sk_cliente serial [primary key]
+  id_cliente_origem int [not null]
+  nome varchar(150)
+  idade int
+  email varchar(100)
+  etnia varchar(50)
+  Note: 'SCD Tipo 1 - Sobrescrita'
+}
+
+Table dim_produto {
+  sk_produto serial [primary key]
+  id_produto_origem int [not null]
+  nome varchar(150)
+  categoria varchar(100)
+  preco_base decimal(10,2)
+  data_inicio date [not null]
+  data_fim date
+  flag_ativo boolean [default: true]
+  Note: 'SCD Tipo 2 - Histórico'
+}
+
+Table dim_fornecedor {
+  sk_fornecedor serial [primary key]
+  id_fornecedor_origem int [not null]
+  nome_fantasia varchar(150)
+  cnpj varchar(18)
+  contato varchar(100)
+  Note: 'SCD Tipo 1 - Sobrescrita'
+}
+
+Table dim_endereco {
+  sk_endereco serial [primary key]
+  id_endereco_origem int [not null]
+  cidade varchar(100)
+  estado varchar(100)
+  pais varchar(50)
+  tipo_endereco varchar(20)
+  data_inicio date [not null]
+  data_fim date
+  flag_ativo boolean [default: true]
+  Note: 'SCD Tipo 2 - Histórico'
+}
+
+Table dim_promocao {
+  sk_promocao serial [primary key]
+  id_promocao_origem int [not null]
+  nome varchar(100)
+  desconto_percentual decimal(5,2)
+  data_inicio date
+  data_fim date
+}
+
+Table dim_personalizacao {
+  sk_personalizacao serial [primary key]
+  id_personalizacao_origem int [not null]
+  tipo_opcao varchar(50)
+  valor_adicional decimal(10,2)
+}
+
+Table dim_avaliacao {
+  sk_avaliacao serial [primary key]
+  id_avaliacao_origem int [not null]
+  nota int [note: 'CHECK 1-5']
+  comentario text
+}
+
+// --- TABELA FATO ---
+
+Table fato_vendas {
+  id_fato serial [primary key]
+  sk_cliente int [not null]
+  sk_produto int [not null]
+  sk_fornecedor int [not null]
+  sk_tempo int [not null]
+  sk_promocao int
+  sk_endereco int [not null]
+  sk_personalizacao int
+  sk_avaliacao int
+  
+  // Métricas
+  quantidade_vendida int [not null]
+  valor_total_item decimal(10,2) [not null]
+  valor_total_pedido decimal(10,2) [not null]
+  desconto_aplicado decimal(10,2)
+  valor_personalizacoes decimal(10,2)
+}
+
+// --- RELACIONAMENTOS (ESTRELA) ---
+
+Ref: dim_cliente.sk_cliente < fato_vendas.sk_cliente
+Ref: dim_produto.sk_produto < fato_vendas.sk_produto
+Ref: dim_fornecedor.sk_fornecedor < fato_vendas.sk_fornecedor
+Ref: dim_tempo.sk_tempo < fato_vendas.sk_tempo
+Ref: dim_promocao.sk_promocao < fato_vendas.sk_promocao
+Ref: dim_endereco.sk_endereco < fato_vendas.sk_endereco
+Ref: dim_personalizacao.sk_personalizacao < fato_vendas.sk_personalizacao
+Ref: dim_avaliacao.sk_avaliacao < fato_vendas.sk_avaliacao
